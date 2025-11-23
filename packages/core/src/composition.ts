@@ -105,6 +105,8 @@ export class Composition {
    */
   seek(time: number): void {
     this.currentTime = Math.max(0, Math.min(time, this.duration));
+    // Update all layers to the new time
+    this.layers.forEach((layer) => layer.updateTime(this.currentTime));
     this.emit('seek');
   }
 

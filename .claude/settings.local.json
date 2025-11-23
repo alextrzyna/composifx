@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git init:*)"
+      "Bash(git init:*)",
+      "Bash(mkdir:*)",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm --filter @composifx/core build:*)",
+      "Bash(pnpm --filter @composifx/renderer-webgl2 build:*)",
+      "Bash(pnpm:*)"
     ],
     "deny": [],
     "ask": []

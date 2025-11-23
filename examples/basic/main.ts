@@ -1,12 +1,18 @@
 /**
- * Basic example demonstrating ComposiFX core API
+ * Basic example demonstrating ComposiFX with WebGL2 renderer
  */
 
 import { Composition, Layer, easing } from '@composifx/core';
+import { WebGL2Renderer } from '@composifx/renderer-webgl2';
 
 // Get canvas element
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-const ctx = canvas.getContext('2d')!;
+
+// Create WebGL2 renderer
+const renderer = new WebGL2Renderer(canvas, {
+  alpha: true,
+  antialias: true,
+});
 
 // Create composition
 const composition = new Composition({
@@ -14,58 +20,88 @@ const composition = new Composition({
   height: 1080,
   duration: 5, // 5 seconds
   frameRate: 60,
-  backgroundColor: { r: 0, g: 0, b: 0, a: 255 },
+  backgroundColor: { r: 20, g: 20, b: 30, a: 255 },
 });
 
-// Create a simple layer with animated properties
+// Create a simple canvas as layer source
+function createTestImage(): HTMLCanvasElement {
+  const size = 400;
+  const testCanvas = document.createElement('canvas');
+  testCanvas.width = size;
+  testCanvas.height = size;
+
+  const ctx = testCanvas.getContext('2d')!;
+
+  // Create a gradient circle
+  const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  gradient.addColorStop(0, '#ff6b35');
+  gradient.addColorStop(0.5, '#f7931e');
+  gradient.addColorStop(1, '#fdc830');
+
+  ctx.fillStyle = gradient;
+  ctx.beginPath();
+  ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Add some text
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 48px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('ComposiFX', size / 2, size / 2);
+
+  return testCanvas;
+}
+
+// Create layers with animated properties
 const layer1 = new Layer({
-  name: 'Animated Circle',
+  name: 'Logo',
+  source: createTestImage(),
   position: { x: 960, y: 540 },
   scale: { x: 1, y: 1 },
   opacity: 1,
 });
 
-// Add layer to composition
+// Animate layer properties
+layer1.position.animate([
+  { time: 0, value: { x: 960, y: 340 }, easing: easing.easeOutCubic },
+  { time: 2, value: { x: 960, y: 540 }, easing: easing.easeInOutCubic },
+  { time: 4, value: { x: 960, y: 740 }, easing: easing.easeInCubic },
+]);
+
+layer1.scale.animate([
+  { time: 0, value: { x: 0.5, y: 0.5 }, easing: easing.easeOutElastic },
+  { time: 1.5, value: { x: 1.2, y: 1.2 }, easing: easing.easeInOutQuad },
+  { time: 3, value: { x: 1, y: 1 }, easing: easing.easeInOutQuad },
+]);
+
+layer1.rotation.animate([
+  { time: 0, value: 0 },
+  { time: 5, value: Math.PI * 2, easing: easing.linear },
+]);
+
+layer1.opacity.animate([
+  { time: 0, value: 0, easing: easing.easeInQuad },
+  { time: 0.5, value: 1, easing: easing.easeOutQuad },
+  { time: 4.5, value: 1, easing: easing.easeInQuad },
+  { time: 5, value: 0 },
+]);
+
+// Add layers to composition
 composition.addLayer(layer1);
 
-// Simple render loop (no WebGL yet, just Canvas 2D for demonstration)
+// Render loop
+let animationFrameId: number;
+
 function render() {
-  // Clear canvas
-  const bg = composition.backgroundColor;
-  ctx.fillStyle = `rgba(${bg.r}, ${bg.g}, ${bg.b}, ${bg.a / 255})`;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Render each visible layer
-  composition.layers.forEach((layer) => {
-    if (!layer.visible) return;
-
-    ctx.save();
-
-    // Apply transforms
-    ctx.globalAlpha = layer.opacity;
-    ctx.translate(layer.position.x, layer.position.y);
-    ctx.rotate(layer.rotation);
-    ctx.scale(layer.scale.x, layer.scale.y);
-
-    // For this demo, draw a simple circle
-    // In a real implementation, we'd render the layer source
-    const time = composition.currentTime;
-    const hue = (time / composition.duration) * 360;
-    const radius = 100 + Math.sin(time * Math.PI) * 50;
-
-    ctx.beginPath();
-    ctx.arc(0, 0, radius, 0, Math.PI * 2);
-    ctx.fillStyle = `hsl(${hue}, 70%, 50%)`;
-    ctx.fill();
-
-    ctx.restore();
-  });
+  // Render the composition using WebGL2
+  renderer.render(composition, composition.currentTime);
 
   // Update time display
   updateTimeDisplay();
 
   // Continue render loop
-  requestAnimationFrame(render);
+  animationFrameId = requestAnimationFrame(render);
 }
 
 // Start render loop
@@ -105,7 +141,14 @@ function updateTimeDisplay() {
   timeDisplay.textContent = `${composition.currentTime.toFixed(2)}s / ${composition.duration.toFixed(2)}s`;
 }
 
+// Clean up on page unload
+window.addEventListener('beforeunload', () => {
+  cancelAnimationFrame(animationFrameId);
+  renderer.dispose();
+});
+
 // Log to console to show API usage
 console.log('ComposiFX Composition created:', composition);
+console.log('WebGL2 Renderer initialized:', renderer);
 console.log('Available easing functions:', Object.keys(easing));
 console.log('Layer:', layer1);

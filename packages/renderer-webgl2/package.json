@@ -1,0 +1,30 @@
+{
+  "name": "@composifx/renderer-webgl2",
+  "version": "0.1.0",
+  "description": "WebGL2 renderer for ComposiFX",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@composifx/core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
+  },
+  "peerDependencies": {
+    "@composifx/core": "workspace:*"
+  }
+}

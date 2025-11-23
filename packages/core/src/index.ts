@@ -11,6 +11,7 @@ export { Layer } from './layer.js';
 export type { LayerOptions } from './layer.js';
 
 export { Parameter } from './parameter.js';
+export { NumberParameter, Vector2Parameter } from './animatable.js';
 
 export { BaseEffect } from './effect.js';
 export type { Effect } from './effect.js';

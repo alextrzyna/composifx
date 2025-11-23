@@ -2,7 +2,7 @@
  * Animatable parameter with keyframe support
  */
 
-import type { Keyframe, EasingFunction } from './types.js';
+import type { Keyframe } from './types.js';
 import { easing } from './easing.js';
 
 export class Parameter<T = number> {
@@ -39,13 +39,13 @@ export class Parameter<T = number> {
     }
 
     // Before first keyframe
-    if (time <= this.keyframes[0].time) {
+    if (this.keyframes[0] && time <= this.keyframes[0].time) {
       return this.keyframes[0].value;
     }
 
     // After last keyframe
     const lastKeyframe = this.keyframes[this.keyframes.length - 1];
-    if (time >= lastKeyframe.time) {
+    if (lastKeyframe && time >= lastKeyframe.time) {
       return lastKeyframe.value;
     }
 
@@ -54,7 +54,7 @@ export class Parameter<T = number> {
       const kf1 = this.keyframes[i];
       const kf2 = this.keyframes[i + 1];
 
-      if (time >= kf1.time && time <= kf2.time) {
+      if (kf1 && kf2 && time >= kf1.time && time <= kf2.time) {
         return this.interpolate(kf1, kf2, time);
       }
     }
