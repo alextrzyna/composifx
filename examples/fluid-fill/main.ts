@@ -23,9 +23,12 @@ if (!canvas) {
   throw new Error('Canvas element not found');
 }
 
+// Set canvas size
+canvas.width = comp.width;
+canvas.height = comp.height;
+
 // Create WebGL2 renderer
-const renderer = new WebGL2Renderer();
-renderer.initialize(canvas);
+const renderer = new WebGL2Renderer(canvas);
 
 // Create a simple test image with transparency
 function createTestImage(): HTMLCanvasElement {

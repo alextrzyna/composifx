@@ -3,9 +3,11 @@
  * Provides GPU-accelerated rendering of compositions
  */
 
-import type { Composition, Layer } from '@composifx/core';
+import type { Composition, Layer, RenderContext } from '@composifx/core';
 import { createProgram, type CompiledShader, BUILT_IN_SHADERS } from './shader-loader.js';
 import { TextureManager, type ManagedTexture } from './texture-manager.js';
+import { GLTexture } from './webgl-texture.js';
+import { EffectRenderer } from './effect-renderer.js';
 
 export interface WebGL2RendererOptions {
   /**
@@ -28,6 +30,7 @@ export class WebGL2Renderer {
   private canvas: HTMLCanvasElement;
   private gl: WebGL2RenderingContext;
   private textureManager: TextureManager;
+  private effectRenderer: EffectRenderer;
   private basicShader: CompiledShader | null = null;
   private quadBuffer: WebGLBuffer | null = null;
   private quadVAO: WebGLVertexArrayObject | null = null;
@@ -49,6 +52,7 @@ export class WebGL2Renderer {
 
     this.gl = gl;
     this.textureManager = new TextureManager(gl);
+    this.effectRenderer = new EffectRenderer(gl);
 
     this.initialize();
   }
@@ -187,12 +191,44 @@ export class WebGL2Renderer {
     // Create or get texture from layer source
     const managedTexture = this.textureManager.createTexture(layer.source);
 
+    // Wrap the managed texture in a GLTexture for effects
+    let currentTexture = new GLTexture(
+      gl,
+      managedTexture.texture,
+      managedTexture.width,
+      managedTexture.height
+    );
+
+    // Apply effects if any
+    if (layer.effects && layer.effects.length > 0) {
+      const renderContext: RenderContext = {
+        time: composition.currentTime,
+        deltaTime: 1 / composition.frameRate,
+        frameRate: composition.frameRate,
+        width: composition.width,
+        height: composition.height,
+      };
+
+      for (const effect of layer.effects) {
+        if (effect.enabled) {
+          const outputTexture = this.effectRenderer.applyEffect(effect, currentTexture, renderContext);
+
+          // Release the previous texture if it's not the original
+          if (currentTexture !== outputTexture && currentTexture.framebuffer) {
+            this.effectRenderer.releaseTexture(currentTexture);
+          }
+
+          currentTexture = outputTexture;
+        }
+      }
+    }
+
     // Use basic shader
     gl.useProgram(this.basicShader.program);
 
-    // Bind texture
+    // Bind the final texture (after effects)
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, managedTexture.texture);
+    gl.bindTexture(gl.TEXTURE_2D, currentTexture.texture);
 
     // Set uniforms
     const matrixLoc = this.basicShader.uniforms.get('u_matrix');
@@ -223,6 +259,11 @@ export class WebGL2Renderer {
     gl.bindVertexArray(this.quadVAO);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
     gl.bindVertexArray(null);
+
+    // Release the effect texture back to the pool if it's a render target
+    if (currentTexture.framebuffer) {
+      this.effectRenderer.releaseTexture(currentTexture);
+    }
   }
 
   /**
