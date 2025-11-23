@@ -46,6 +46,25 @@ importers:
         specifier: ^6.0.0
         version: 6.4.1(@types/node@22.19.1)
 
+  examples/fluid-fill:
+    dependencies:
+      '@composifx/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@composifx/effect-fluid-fill':
+        specifier: workspace:*
+        version: link:../../packages/effect-fluid-fill
+      '@composifx/renderer-webgl2':
+        specifier: workspace:*
+        version: link:../../packages/renderer-webgl2
+    devDependencies:
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
+      vite:
+        specifier: ^6.0.3
+        version: 6.4.1(@types/node@22.19.1)
+
   packages/core:
     devDependencies:
       typescript:
@@ -56,6 +75,24 @@ importers:
         version: 6.4.1(@types/node@22.19.1)
       vite-plugin-dts:
         specifier: ^4.0.0
+        version: 4.5.4(@types/node@22.19.1)(typescript@5.9.3)(vite@6.4.1)
+
+  packages/effect-fluid-fill:
+    devDependencies:
+      '@composifx/core':
+        specifier: workspace:*
+        version: link:../core
+      '@composifx/renderer-webgl2':
+        specifier: workspace:*
+        version: link:../renderer-webgl2
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
+      vite:
+        specifier: ^6.0.3
+        version: 6.4.1(@types/node@22.19.1)
+      vite-plugin-dts:
+        specifier: ^4.3.0
         version: 4.5.4(@types/node@22.19.1)(typescript@5.9.3)(vite@6.4.1)
 
   packages/renderer-webgl2:

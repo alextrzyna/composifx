@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ComposiFX - FluidFill Effect Demo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem;
+        color: white;
+      }
+
+      h1 {
+        margin-bottom: 0.5rem;
+        font-size: 2.5rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .subtitle {
+        margin-bottom: 2rem;
+        opacity: 0.9;
+        font-size: 1.1rem;
+      }
+
+      #canvas-container {
+        background: rgba(0, 0, 0, 0.2);
+        padding: 1rem;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        margin-bottom: 2rem;
+      }
+
+      canvas {
+        display: block;
+        border-radius: 8px;
+        background: #1a1a1a;
+      }
+
+      .controls {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        max-width: 800px;
+        width: 100%;
+      }
+
+      .control-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .control-group:last-child {
+        margin-bottom: 0;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      button {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s;
+        font-size: 0.9rem;
+      }
+
+      button:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-1px);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      button.active {
+        background: rgba(255, 255, 255, 0.4);
+      }
+
+      .slider-container {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      input[type='range'] {
+        flex: 1;
+        height: 6px;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.2);
+        outline: none;
+        -webkit-appearance: none;
+      }
+
+      input[type='range']::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: white;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      input[type='range']::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: white;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .value-display {
+        min-width: 60px;
+        text-align: right;
+        font-weight: 500;
+        font-family: 'Monaco', 'Courier New', monospace;
+      }
+
+      .info {
+        margin-top: 2rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        font-size: 0.85rem;
+        line-height: 1.6;
+      }
+
+      .info strong {
+        color: #ffd700;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>ComposiFX FluidFill Effect</h1>
+    <p class="subtitle">Organic fluid fill animation effect</p>
+
+    <div id="canvas-container">
+      <canvas id="canvas" width="800" height="600"></canvas>
+    </div>
+
+    <div class="controls">
+      <div class="control-group">
+        <label>Playback Controls</label>
+        <div class="button-group">
+          <button id="play-btn">Play</button>
+          <button id="pause-btn">Pause</button>
+          <button id="reset-btn">Reset</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>Fill Direction</label>
+        <div class="button-group">
+          <button class="direction-btn active" data-direction="center-out">
+            Center Out
+          </button>
+          <button class="direction-btn" data-direction="edge-in">Edge In</button>
+          <button class="direction-btn" data-direction="left-right">
+            Left to Right
+          </button>
+          <button class="direction-btn" data-direction="top-bottom">
+            Top to Bottom
+          </button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>Fill Progress</label>
+        <div class="slider-container">
+          <input
+            type="range"
+            id="progress-slider"
+            min="0"
+            max="100"
+            value="0"
+          />
+          <span class="value-display" id="progress-value">0%</span>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>Fill Speed</label>
+        <div class="slider-container">
+          <input type="range" id="speed-slider" min="10" max="100" value="50" />
+          <span class="value-display" id="speed-value">1.0x</span>
+        </div>
+      </div>
+
+      <div class="info">
+        <strong>Note:</strong> This is a Phase 1 implementation of the FluidFill
+        effect. The basic structure and API are in place. The WebGL shader-based
+        rendering will be implemented next to create the organic fluid fill
+        animation effect.
+      </div>
+    </div>
+
+    <script type="module" src="/main.ts"></script>
+  </body>
+</html>

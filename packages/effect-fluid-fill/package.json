@@ -1,0 +1,44 @@
+{
+  "name": "@composifx/effect-fluid-fill",
+  "version": "0.1.0",
+  "description": "FluidFill effect for ComposiFX - organic fluid fill animation effect",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "composifx",
+    "effect",
+    "fluid-fill",
+    "animation",
+    "webgl",
+    "motion-graphics"
+  ],
+  "author": "ComposiFX",
+  "license": "MIT",
+  "peerDependencies": {
+    "@composifx/core": "workspace:*",
+    "@composifx/renderer-webgl2": "workspace:*"
+  },
+  "devDependencies": {
+    "@composifx/core": "workspace:*",
+    "@composifx/renderer-webgl2": "workspace:*",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.3",
+    "vite-plugin-dts": "^4.3.0"
+  }
+}

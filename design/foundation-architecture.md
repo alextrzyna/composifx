@@ -4,9 +4,18 @@
 
 **Last Updated:** 2025-11-23
 
-**Implementation Status:** Phase 1 Foundation ✅ **FULLY COMPLETED**
+**Implementation Status:** Phase 2 FluidFill Effect ⏳ **IN PROGRESS**
 
-The complete foundation architecture including the WebGL2 renderer and full animation system has been implemented and tested. The system is now ready for Phase 2 (Auto Fill Effect).
+Phase 1 foundation is complete. Phase 2.1-2.3 (FluidFill package setup and shader creation) are complete. Currently working on Phase 2.4 (shader integration with WebGL2 renderer).
+
+**Phase 1:** ✅ **FULLY COMPLETED**
+- Complete foundation architecture including WebGL2 renderer and animation system
+
+**Phase 2 Progress:**
+- ✅ Phase 2.1: FluidFill package structure and API design
+- ✅ Phase 2.2: SDF shaders created (Jump Flooding Algorithm)
+- ✅ Phase 2.3: Basic radial fill shader created
+- ⏳ Phase 2.4: WebGL2 renderer integration (NEXT)
 
 **Current Capabilities:**
 - ✅ Full composition system with timeline and playback controls
@@ -27,7 +36,7 @@ ComposiFX is a TypeScript/JavaScript library for creating scripted compositing, 
 - **AI Agent-Friendly API**: Clear, predictable, and well-documented interfaces
 - **Modular Architecture**: Tree-shakeable, plugin-based system for effects
 - **Performance**: WebGL2-based rendering with efficient caching
-- **First Effect**: Auto Fill - a fluid fill animation effect inspired by After Effects
+- **First Effect**: FluidFill - a fluid fill animation effect inspired by After Effects
 
 ---
 
@@ -56,7 +65,7 @@ ComposiFX is a TypeScript/JavaScript library for creating scripted compositing, 
 composifx/
 ├── core/              # Core composition engine (required)
 ├── effects/           # Effect plugins (optional, tree-shakeable)
-│   ├── auto-fill/
+│   ├── fluid-fill/
 │   ├── blur/
 │   ├── glow/
 │   └── ...
@@ -74,11 +83,11 @@ composifx/
 import { Composition, Layer } from 'composifx';
 
 // Individual effects (tree-shakeable)
-import { AutoFill } from 'composifx/effects/auto-fill';
+import { FluidFill } from 'composifx/effects/fluid-fill';
 import { Blur } from 'composifx/effects/blur';
 
 // Or via plugin registration
-composition.use(AutoFill);
+composition.use(FluidFill);
 ```
 
 ### 1.3 Core Components
@@ -127,7 +136,7 @@ interface Layer {
 ```
 
 #### Effect
-Base interface for all effects (blur, glow, auto-fill, etc.)
+Base interface for all effects (blur, glow, fluid-fill, etc.)
 
 ```typescript
 interface Effect {
@@ -174,7 +183,7 @@ interface Effect {
 ### 2.2 Example API Usage
 
 ```typescript
-import { Composition, Layer, AutoFill, easing } from 'composifx';
+import { Composition, Layer, FluidFill, easing } from 'composifx';
 
 // Create composition
 const comp = new Composition({
@@ -190,18 +199,18 @@ const logoLayer = new Layer({
   source: await loadImage('./logo.png')
 });
 
-// Add Auto Fill effect
-const autoFill = new AutoFill({
+// Add FluidFill effect
+const fluidFill = new FluidFill({
   direction: 'center-out',
   speed: 1.0,
   fillColor: '#ff6b35',
   style: 'fluid'
 });
 
-logoLayer.addEffect(autoFill);
+logoLayer.addEffect(fluidFill);
 
 // Animate effect parameters
-autoFill.animate('progress', [
+fluidFill.animate('progress', [
   { time: 0, value: 0 },
   { time: 2, value: 1, easing: easing.easeInOutCubic }
 ]);
@@ -233,11 +242,11 @@ comp.play();
 
 ---
 
-## 3. Auto Fill Effect Implementation
+## 3. FluidFill Effect Implementation
 
 ### 3.1 Overview
 
-Auto Fill is a fluid animation effect that fills layer bounds based on transparency, creating organic growth animations. It simulates liquid flowing through an image, avoiding transparent areas.
+FluidFill is a fluid animation effect that fills layer bounds based on transparency, creating organic growth animations. It simulates liquid flowing through an image, avoiding transparent areas.
 
 **Key Features** (from After Effects plugin)
 - Uses layer transparency as a flow guide
@@ -261,10 +270,10 @@ Auto Fill is a fluid animation effect that fills layer bounds based on transpare
 - Multi-pass rendering for style composition
 - Texture caching for performance
 
-### 3.3 Auto Fill API
+### 3.3 FluidFill API
 
 ```typescript
-interface AutoFillOptions {
+interface FluidFillOptions {
   // Flow direction
   direction: 'center-out' | 'edge-in' | 'left-right' | 'top-bottom' | 'custom';
   anchorPoint?: Vector2; // For 'custom' direction
@@ -283,10 +292,10 @@ interface AutoFillOptions {
   threshold?: number; // Alpha threshold for transparency
 
   // Multi-layer style builder
-  layers?: AutoFillLayer[];
+  layers?: FluidFillLayer[];
 }
 
-interface AutoFillLayer {
+interface FluidFillLayer {
   delay: number; // Offset in seconds
   color: Color;
   blendMode: BlendMode;
@@ -294,8 +303,8 @@ interface AutoFillLayer {
   displace?: number;
 }
 
-class AutoFill implements Effect {
-  name = 'Auto Fill';
+class FluidFill implements Effect {
+  name = 'FluidFill';
   parameters = {
     progress: new Parameter(0, 0, 1), // Animatable 0-1
     speed: new Parameter(1.0, 0.1, 10),
@@ -303,7 +312,7 @@ class AutoFill implements Effect {
     // ... other parameters
   };
 
-  constructor(options: AutoFillOptions);
+  constructor(options: FluidFillOptions);
 
   apply(input: Texture, context: RenderContext): Texture;
 
@@ -314,7 +323,7 @@ class AutoFill implements Effect {
 
 ### 3.4 Implementation Phases
 
-**Phase 1: Basic Auto Fill**
+**Phase 1: Basic FluidFill**
 - Simple center-out radial fill
 - Single color fill
 - Alpha-based masking
@@ -506,13 +515,13 @@ composifx/
 
 ```
 packages/
-├── effect-auto-fill/        # @composifx/effect-auto-fill (NEXT - Phase 2)
+├── effect-fluid-fill/        # @composifx/effect-fluid-fill (NEXT - Phase 2)
 │   ├── src/
 │   │   ├── shaders/
 │   │   │   ├── sdf.frag
 │   │   │   ├── flow.frag
 │   │   │   └── composite.frag
-│   │   ├── auto-fill.ts
+│   │   ├── fluid-fill.ts
 │   │   ├── presets.ts
 │   │   └── index.ts
 │   ├── examples/
@@ -527,7 +536,7 @@ packages/
 **Separate Packages**
 - `@composifx/core` - Core composition engine
 - `@composifx/renderer-webgl2` - WebGL2 renderer
-- `@composifx/effect-auto-fill` - Auto Fill effect
+- `@composifx/effect-fluid-fill` - FluidFill effect
 - `@composifx/effect-blur` - Blur effect
 - `@composifx/effects` - Bundled effects (convenience)
 
@@ -537,7 +546,7 @@ packages/
 npm install @composifx/core @composifx/renderer-webgl2
 
 # With specific effects
-npm install @composifx/effect-auto-fill
+npm install @composifx/effect-fluid-fill
 
 # With all effects
 npm install @composifx/effects
@@ -597,9 +606,9 @@ After initial WebGL2 renderer implementation, discovered and fixed animation sys
 
 ---
 
-### Phase 2: Auto Fill Effect
+### Phase 2: FluidFill Effect ⏳ IN PROGRESS
 
-**Goal:** Implement the signature Auto Fill effect with fluid animation capabilities.
+**Goal:** Implement the signature FluidFill effect with fluid animation capabilities.
 
 **Prerequisites:** ✅ All complete
 - WebGL2 renderer with shader pipeline
@@ -607,35 +616,58 @@ After initial WebGL2 renderer implementation, discovered and fixed animation sys
 - Parameter animation system
 - Effect plugin architecture
 
-**Next Steps:**
+**Progress:**
 
-#### 2.1 Basic Auto Fill Effect Package Setup
-- [ ] Create `@composifx/effect-auto-fill` package structure
-- [ ] Set up package.json and build configuration
-- [ ] Define AutoFill effect class extending BaseEffect
-- [ ] Create basic parameter interface (progress, direction, color)
+#### 2.1 Basic FluidFill Effect Package Setup ✅ COMPLETED
+- [x] Create `@composifx/effect-fluid-fill` package structure
+- [x] Set up package.json and build configuration
+- [x] Define FluidFill effect class extending BaseEffect
+- [x] Create basic parameter interface (progress, direction, color)
 
-#### 2.2 Distance Field Generation (SDF)
-- [ ] Implement Jump Flooding Algorithm shaders
-  - [ ] Initialization pass (seed from alpha channel)
-  - [ ] Jump flooding passes (iterative distance propagation)
-  - [ ] Final distance field output
+**Completed Files:**
+- `packages/effect-fluid-fill/src/fluid-fill.ts` - FluidFill effect class with animatable parameters
+- `packages/effect-fluid-fill/package.json` - Package configuration
+- `packages/effect-fluid-fill/vite.config.ts` - Build configuration
+- `examples/fluid-fill/` - Interactive demo example
+
+#### 2.2 Distance Field Generation (SDF) ✅ SHADERS CREATED
+- [x] Implement Jump Flooding Algorithm shaders
+  - [x] Initialization pass (seed from alpha channel) - `sdf-init.frag.glsl`
+  - [x] Jump flooding passes (iterative distance propagation) - `sdf-jump.frag.glsl`
+  - [x] Final distance field output - `sdf-flow.frag.glsl`
 - [ ] Create framebuffer management for multi-pass rendering
 - [ ] Add SDF caching system for performance
 
-#### 2.3 Basic Radial Fill Implementation
-- [ ] Implement center-out radial fill shader
-- [ ] Add progress parameter (0-1) for fill amount
-- [ ] Implement simple color fill (single solid color)
-- [ ] Add alpha-based masking using layer transparency
+**Shader Files Created:**
+- `packages/effect-fluid-fill/src/shaders/sdf-init.frag.glsl` - SDF initialization from alpha
+- `packages/effect-fluid-fill/src/shaders/sdf-jump.frag.glsl` - Jump flooding propagation
+- `packages/effect-fluid-fill/src/shaders/sdf-flow.frag.glsl` - Flow direction generation
 
-#### 2.4 Integration & Testing
-- [ ] Create example demonstrating Auto Fill effect
+#### 2.3 Basic Radial Fill Implementation ✅ SHADER CREATED
+- [x] Implement center-out radial fill shader - `radial-fill.frag.glsl`
+- [x] Add progress parameter (0-1) for fill amount
+- [x] Implement simple color fill (single solid color)
+- [x] Add alpha-based masking using layer transparency
+- [ ] Integrate shader into WebGL2 renderer pipeline
+
+**Shader Files Created:**
+- `packages/effect-fluid-fill/src/shaders/radial-fill.frag.glsl` - Basic radial fill effect
+
+#### 2.4 Integration & Testing ⏳ IN PROGRESS
+- [x] Create example demonstrating FluidFill effect
+- [ ] Integrate shaders with WebGL2 renderer
 - [ ] Test with various image sources and alpha channels
 - [ ] Performance profiling and optimization
 - [ ] Documentation for basic usage
 
-**Timeline:** 2-3 weeks for basic implementation
+**Next Steps:**
+1. Integrate FluidFill shaders with WebGL2 renderer
+2. Implement multi-pass rendering for SDF generation
+3. Connect shader uniforms to effect parameters
+4. Test and validate visual output
+5. Performance optimization
+
+**Timeline:** 1-2 weeks remaining for shader integration and testing
 
 ### Phase 3: Advanced Features (Weeks 7-9)
 - [ ] Multiple speed map modes
@@ -718,9 +750,9 @@ Special documentation section for AI agents:
 - **Garbage Collection**: Explicit disposal methods
 - **Resource Limits**: Warn on excessive memory usage
 
-### 10.3 Compute Caching (Auto Fill)
+### 10.3 Compute Caching (FluidFill)
 ```typescript
-class AutoFillCache {
+class FluidFillCache {
   // Cache expensive SDF computation
   private sdfCache = new Map<string, Texture>();
 
@@ -748,7 +780,7 @@ class AutoFillCache {
 | **Effects System** | ✅ Modular plugins | ❌ | ⚠️ Limited filters | ❌ | ✅ Extensive |
 | **AI-Friendly API** | ✅ Designed for it | ⚠️ | ⚠️ | ✅ | ❌ |
 | **Tree-Shakeable** | ✅ Per-effect | ❌ | ⚠️ | ⚠️ | N/A |
-| **Auto Fill** | ✅ Planned | ❌ | ❌ | ❌ | ✅ (plugin) |
+| **FluidFill** | ✅ Planned | ❌ | ❌ | ❌ | ✅ (plugin) |
 | **Browser-Native** | ✅ | ✅ | ✅ | ✅ | ❌ |
 
 **ComposiFX Unique Value**:
@@ -806,10 +838,10 @@ class AutoFillCache {
 
 ## References
 
-### Auto Fill Research
-- [AutoFill v2 - aescripts.com](https://aescripts.com/autofill/)
-- [AutoFill Tips and Tricks Tutorial](https://aescripts.com/learn/autofill-tips-and-tricks---after-effects-tutorial/)
-- [AutoFill Plugin Everything](https://www.plugineverything.com/autofill)
+### Fluid Fill Animation Research
+- [Auto Fill v2 - aescripts.com](https://aescripts.com/autofill/) - Inspiration for fluid fill effects
+- [Auto Fill Tips and Tricks Tutorial](https://aescripts.com/learn/autofill-tips-and-tricks---after-effects-tutorial/)
+- [Auto Fill Plugin Everything](https://www.plugineverything.com/autofill)
 
 ### Motion Graphics Libraries
 - [VFX-JS: WebGL Effects Made Easy](https://tympanus.net/codrops/2025/01/20/vfx-js-webgl-effects-made-easy/)
@@ -828,9 +860,9 @@ class AutoFillCache {
 
 ---
 
-## Appendix A: Distance Field Algorithm (for Auto Fill)
+## Appendix A: Distance Field Algorithm (for FluidFill)
 
-The Signed Distance Field (SDF) is crucial for Auto Fill's fluid behavior.
+The Signed Distance Field (SDF) is crucial for FluidFill's fluid behavior.
 
 **Jump Flooding Algorithm (JFA)**
 1. Initialize seeds from opaque pixels
@@ -878,7 +910,7 @@ vec4 flowDirection(vec2 uv) {
 }
 ```
 
-This SDF serves as the foundation for Auto Fill's fluid simulation, guiding particles or flood-fill algorithms to create organic growth patterns that respect the layer's transparency.
+This SDF serves as the foundation for FluidFill's fluid simulation, guiding particles or flood-fill algorithms to create organic growth patterns that respect the layer's transparency.
 
 ---
 

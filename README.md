@@ -23,11 +23,11 @@ ComposiFX brings After Effects-like compositing capabilities to the web with a s
 
 - ✅ Core composition engine
 - ✅ Layer management with transforms
-- ✅ Animation and keyframe system
-- ✅ Comprehensive easing functions
+- ✅ Animation and keyframe system (30+ easing functions)
 - ✅ Effect plugin architecture
-- 🚧 WebGL2 renderer (planned)
-- 🚧 Auto Fill effect (in design)
+- ✅ WebGL2 renderer with texture management
+- ✅ Interactive demo with animations
+- 🚧 FluidFill effect (package structure complete, shader integration in progress)
 - 🚧 Additional effects library
 
 ## Quick Start
@@ -83,11 +83,13 @@ pnpm dev
 ```
 composifx/
 ├── packages/
-│   └── core/              # Core composition engine
+│   ├── core/                    # Core composition engine
+│   ├── renderer-webgl2/         # WebGL2 renderer
+│   └── effect-fluid-fill/        # FluidFill effect (in development)
 ├── examples/
-│   └── basic/             # Basic usage example
-├── design/                # Architecture and design docs
-└── docs/                  # Documentation (planned)
+│   ├── basic/                   # Basic WebGL2 example with animations
+│   └── fluid-fill/               # FluidFill effect demo (in development)
+└── design/                      # Architecture and design docs
 ```
 
 ## Architecture
@@ -95,34 +97,40 @@ composifx/
 ComposiFX uses a modular monorepo structure:
 
 - **@composifx/core** - Core composition engine (layers, timeline, effects system)
-- **@composifx/renderer-webgl2** - WebGL2 renderer (planned)
-- **@composifx/effect-auto-fill** - Auto Fill effect (planned)
+- **@composifx/renderer-webgl2** - WebGL2 GPU-accelerated renderer
+- **@composifx/effect-fluid-fill** - FluidFill effect (in development)
 - Additional effect packages (planned)
 
 See [design/foundation-architecture.md](design/foundation-architecture.md) for detailed architecture documentation.
 
 ## Roadmap
 
-### Phase 1: Foundation ✅
+### Phase 1: Foundation ✅ COMPLETED
 - Core composition system
-- Layer management
-- Animation/keyframe system
+- Layer management with animatable properties
+- Animation/keyframe system with 30+ easing functions
 - Effect plugin architecture
+- WebGL2 renderer with shader pipeline
+- Texture management and caching
+- Interactive demo
 
-### Phase 2: Rendering (In Progress)
-- WebGL2 renderer
-- Texture management
-- Shader system
+### Phase 2: FluidFill Effect ⏳ IN PROGRESS
+- Package structure and API design ✅
+- Distance field generation shaders (Jump Flooding Algorithm) ✅
+- Basic radial fill shader ✅
+- WebGL2 renderer integration (in progress)
+- Multi-pass rendering pipeline (pending)
+- Visual testing and optimization (pending)
 
-### Phase 3: Auto Fill Effect
-- Distance field generation
-- Flow simulation
-- Style builder
-- Preset system
+### Phase 3: Advanced Features (Planned)
+- Multiple fill directions and speed maps
+- Turbulent noise integration
+- Multi-layer style builder
+- Preset system with 30+ presets
 
-### Phase 4: Ecosystem
-- Additional effects
-- Documentation site
+### Phase 4: Ecosystem (Planned)
+- Additional effects (blur, glow, displacement, etc.)
+- Documentation site with API reference
 - Interactive playground
 - Community contributions
 
@@ -146,7 +154,7 @@ MIT
 
 ComposiFX is inspired by:
 - Adobe After Effects - Industry-standard motion graphics workflow
-- [Auto Fill Plugin](https://aescripts.com/autofill/) - Fluid animation effects
+- [FluidFill Plugin](https://aescripts.com/autofill/) - Fluid animation effects
 - [Motion.dev](https://motion.dev) - Modern web animation
 - [VFX-JS](https://tympanus.net/codrops/2025/01/20/vfx-js-webgl-effects-made-easy/) - Simplified WebGL effects
 

@@ -1,0 +1,20 @@
+{
+  "name": "@composifx/example-fluid-fill",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@composifx/core": "workspace:*",
+    "@composifx/renderer-webgl2": "workspace:*",
+    "@composifx/effect-fluid-fill": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vite": "^6.0.3"
+  }
+}
